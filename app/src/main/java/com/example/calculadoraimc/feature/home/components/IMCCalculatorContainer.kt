@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,20 +27,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculadoraimc.datasource.Calculations
-import com.example.calculadoraimc.feature.home.model.IMCData
+import com.example.calculadoraimc.feature.home.model.HealthMetrics
 import com.example.calculadoraimc.ui.theme.CalculadoraIMCTheme
 
 @Composable
 fun IMCCalculatorContainer(
-    onResult: (IMCData) -> Unit
+    onMetricsCalculated: (HealthMetrics) -> Unit,
+    onInvalidInput: () -> Unit
 ) {
 
     var height by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var sex by remember { mutableStateOf("Masculino") }
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
-        // Inputs
+        // Inputs de altura e peso
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -81,6 +85,65 @@ fun IMCCalculatorContainer(
             }
         }
 
+        Spacer(Modifier.height(16.dp))
+
+        // Inputs de idade e sexo
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // --- Input da idade ---
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Idade",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = age,
+                    onValueChange = { age = it },
+                    placeholder = { Text("Ex: 25") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+
+            // --- Seleção de sexo ---
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Sexo",
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = { sex = "Masculino" },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = if (sex == "Masculino") Color(0xFF2196F3) else Color.Transparent,
+                            contentColor = if (sex == "Masculino") Color.White else Color(0xFF2196F3)
+                        )
+                    ) {
+                        Text("M")
+                    }
+                    OutlinedButton(
+                        onClick = { sex = "Feminino" },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = if (sex == "Feminino") Color(0xFF2196F3) else Color.Transparent,
+                            contentColor = if (sex == "Feminino") Color.White else Color(0xFF2196F3)
+                        )
+                    ) {
+                        Text("F")
+                    }
+                }
+            }
+        }
+
         Spacer(Modifier.height(32.dp))
 
         // Botao
@@ -89,10 +152,13 @@ fun IMCCalculatorContainer(
                 .fillMaxWidth()
                 .height(56.dp),
             onClick = {
-                Calculations.calculateIMC(
+                Calculations.calculateAllMetrics(
                     height = height,
                     weight = weight,
-                    response = onResult
+                    age = age,
+                    sex = sex,
+                    response = onMetricsCalculated,
+                    onError = onInvalidInput
                 )
             },
             shape = RoundedCornerShape(50),
@@ -103,7 +169,6 @@ fun IMCCalculatorContainer(
             Text(text = "CALCULAR", fontSize = 18.sp)
         }
     }
-
 }
 
 @Preview(showBackground = true)
@@ -111,7 +176,8 @@ fun IMCCalculatorContainer(
 private fun IMCCalculatorContainerPreview() {
     CalculadoraIMCTheme {
         IMCCalculatorContainer(
-            onResult = {}
+            onMetricsCalculated = {},
+            onInvalidInput = {}
         )
     }
 }

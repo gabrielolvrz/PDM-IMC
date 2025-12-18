@@ -1,36 +1,60 @@
 package com.example.calculadoraimc.datasource
 
 import android.annotation.SuppressLint
+import com.example.calculadoraimc.feature.home.model.HealthMetrics
 import com.example.calculadoraimc.feature.home.model.IMCData
 
 object Calculations {
 
+    /**
+     * Calcula o IMC, a Taxa Metabólica Basal (TMB) e o Peso Ideal.
+     */
     @SuppressLint("DefaultLocale")
-    fun calculateIMC(height: String, weight: String, response: (IMCData) -> Unit) {
-        if (height.isNotEmpty() && weight.isNotEmpty()) {
-            val heightFormatted = height.replace(",", ".").toDoubleOrNull()
-            val weightFormatted = weight.replace(",", ".").toDoubleOrNull()
+    fun calculateAllMetrics(
+        height: String,
+        weight: String,
+        age: String,
+        sex: String,
+        response: (HealthMetrics) -> Unit,
+        onError: () -> Unit
+    ) {
+        val heightCm = height.replace(",", ".").toDoubleOrNull()
+        val weightKg = weight.replace(",", ".").toDoubleOrNull()
+        val ageYears = age.toIntOrNull()
 
-            if (weightFormatted != null && heightFormatted != null && heightFormatted > 0) {
-                val alturaEmMetros = heightFormatted / 100
-                val imc = weightFormatted / (alturaEmMetros * alturaEmMetros)
-                val imcFormate = String.format("%.2f", imc)
-
-                val imcData = when {
-                    imc < 18.5 -> IMCData(imcFormate, "Abaixo do peso")
-                    imc < 25 -> IMCData(imcFormate, "Peso normal")
-                    imc < 30 -> IMCData(imcFormate, "Sobrepeso")
-                    imc < 35 -> IMCData(imcFormate, "Obesidade Grau I")
-                    imc < 40 -> IMCData(imcFormate, "Obesidade Grau II")
-                    else -> IMCData(imcFormate, "Obesidade Grau III")
-                }
-
-                response(imcData)
-            } else {
-                response(IMCData("null", "Valores inválidos"))
+        if (heightCm != null && weightKg != null && ageYears != null) {
+            // --- Cálculo do IMC ---
+            val imcValue = weightKg / ((heightCm / 100) * (heightCm / 100))
+            val imcFormate = String.format("%.2f", imcValue)
+            val imcData = when {
+                imcValue < 18.5 -> IMCData(imcFormate, "Abaixo do peso")
+                imcValue < 25 -> IMCData(imcFormate, "Peso normal")
+                imcValue < 30 -> IMCData(imcFormate, "Sobrepeso")
+                imcValue < 35 -> IMCData(imcFormate, "Obesidade Grau I")
+                imcValue < 40 -> IMCData(imcFormate, "Obesidade Grau II")
+                else -> IMCData(imcFormate, "Obesidade Grau III")
             }
+
+            // --- Cálculo da TMB (Fórmula de Mifflin-St Jeor) ---
+            val bmr = if (sex == "Masculino") {
+                (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) + 5
+            } else { // Feminino
+                (10 * weightKg) + (6.25 * heightCm) - (5 * ageYears) - 161
+            }
+            val bmrFormatted = String.format("%.2f kcal", bmr)
+
+            // --- Cálculo do Peso Ideal (Fórmula de Devine) ---
+            val idealWeight = if (sex == "Masculino") {
+                50 + 2.3 * ((heightCm / 2.54) - 60)
+            } else { // Feminino
+                45.5 + 2.3 * ((heightCm / 2.54) - 60)
+            }
+            val idealWeightFormatted = String.format("%.2f kg", idealWeight)
+
+            response(HealthMetrics(imcData, bmrFormatted, idealWeightFormatted))
+
         } else {
-            response(IMCData("null", "Nenhum IMC Calculado"))
+            onError()
         }
     }
 }
