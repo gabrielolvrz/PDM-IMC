@@ -7,7 +7,7 @@ import com.example.calculadoraimc.feature.home.model.IMCData
 object Calculations {
 
     /**
-     * Calcula o IMC, a Taxa Metabólica Basal (TMB) e o Peso Ideal.
+     * Calcula o IMC, a Taxa Metabólica Basal (TMB), o Peso Ideal e a Necessidade Calórica Diária.
      */
     @SuppressLint("DefaultLocale")
     fun calculateAllMetrics(
@@ -15,6 +15,7 @@ object Calculations {
         weight: String,
         age: String,
         sex: String,
+        activityLevel: String,
         response: (HealthMetrics) -> Unit,
         onError: () -> Unit
     ) {
@@ -51,7 +52,18 @@ object Calculations {
             }
             val idealWeightFormatted = String.format("%.2f kg", idealWeight)
 
-            response(HealthMetrics(imcData, bmrFormatted, idealWeightFormatted))
+            // --- Cálculo da Necessidade Calórica Diária ---
+            val activityFactor = when (activityLevel) {
+                "Pouco ativo" -> 1.375
+                "Moderadamente ativo" -> 1.55
+                "Muito ativo" -> 1.725
+                else -> 1.2 // Sedentário
+            }
+            val dailyCaloricNeeds = bmr * activityFactor
+            val dailyCaloricNeedsFormatted = String.format("%.2f kcal", dailyCaloricNeeds)
+
+
+            response(HealthMetrics(imcData, bmrFormatted, idealWeightFormatted, dailyCaloricNeedsFormatted))
 
         } else {
             onError()

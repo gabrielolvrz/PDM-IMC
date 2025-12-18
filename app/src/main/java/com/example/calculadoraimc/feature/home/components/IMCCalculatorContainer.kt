@@ -10,9 +10,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +35,7 @@ import com.example.calculadoraimc.datasource.Calculations
 import com.example.calculadoraimc.feature.home.model.HealthMetrics
 import com.example.calculadoraimc.ui.theme.CalculadoraIMCTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IMCCalculatorContainer(
     onMetricsCalculated: (HealthMetrics) -> Unit,
@@ -40,6 +46,11 @@ fun IMCCalculatorContainer(
     var weight by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var sex by remember { mutableStateOf("Masculino") }
+    var activityLevel by remember { mutableStateOf("Sedentário") }
+    var expandedActivity by remember { mutableStateOf(false) }
+
+    val activityLevels = listOf("Sedentário", "Pouco ativo", "Moderadamente ativo", "Muito ativo")
+
 
     Column(modifier = Modifier.fillMaxWidth()) {
 
@@ -143,6 +154,30 @@ fun IMCCalculatorContainer(
                 }
             }
         }
+        
+        Spacer(Modifier.height(16.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = expandedActivity,
+            onExpandedChange = { expandedActivity = !expandedActivity }
+        ) {
+            TextField(
+                value = activityLevel,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Nível de Atividade") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedActivity) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+            ExposedDropdownMenu(expanded = expandedActivity, onDismissRequest = { expandedActivity = false }) {
+                activityLevels.forEach {
+                    DropdownMenuItem(text = { Text(it) }, onClick = {
+                        activityLevel = it
+                        expandedActivity = false
+                    })
+                }
+            }
+        }
 
         Spacer(Modifier.height(32.dp))
 
@@ -157,6 +192,7 @@ fun IMCCalculatorContainer(
                     weight = weight,
                     age = age,
                     sex = sex,
+                    activityLevel = activityLevel,
                     response = onMetricsCalculated,
                     onError = onInvalidInput
                 )

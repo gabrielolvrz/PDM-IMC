@@ -6,5 +6,6 @@ package com.example.calculadoraimc.feature.home.model
 data class HealthMetrics(
     val imcData: IMCData,
     val bmr: String, // Taxa Metabólica Basal
-    val idealWeight: String // Peso Ideal
+    val idealWeight: String, // Peso Ideal
+    val dailyCaloricNeeds: String // Necessidade Calórica Diária
 )
