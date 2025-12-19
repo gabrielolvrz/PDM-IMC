@@ -2,7 +2,6 @@ package com.example.calculadoraimc.feature.home.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,20 +31,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.calculadoraimc.datasource.Calculations
-import com.example.calculadoraimc.feature.home.model.HealthMetrics
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculadoraimc.ui.theme.CalculadoraIMCTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home() {
-    var metrics by remember { mutableStateOf<HealthMetrics?>(null) }
-    var showError by remember { mutableStateOf(false) }
-    var height by remember { mutableStateOf("") }
-    var weight by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var sex by remember { mutableStateOf("Masculino") }
-    var activityLevel by remember { mutableStateOf("Sedentário") }
+fun Home(homeViewModel: HomeViewModel = viewModel()) {
+
     var expandedSex by remember { mutableStateOf(false) }
     var expandedActivity by remember { mutableStateOf(false) }
 
@@ -75,22 +67,22 @@ fun Home() {
             // Entrada de dados
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 TextField(
-                    value = height,
-                    onValueChange = { height = it },
+                    value = homeViewModel.height,
+                    onValueChange = { homeViewModel.onHeightChange(it) },
                     label = { Text("Altura (cm)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                 TextField(
-                    value = weight,
-                    onValueChange = { weight = it },
+                    value = homeViewModel.weight,
+                    onValueChange = { homeViewModel.onWeightChange(it) },
                     label = { Text("Peso (kg)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
                 TextField(
-                    value = age,
-                    onValueChange = { age = it },
+                    value = homeViewModel.age,
+                    onValueChange = { homeViewModel.onAgeChange(it) },
                     label = { Text("Idade") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
@@ -98,7 +90,7 @@ fun Home() {
 
                 ExposedDropdownMenuBox(expanded = expandedSex, onExpandedChange = { expandedSex = !expandedSex }) {
                     TextField(
-                        value = sex,
+                        value = homeViewModel.sex,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Sexo") },
@@ -108,7 +100,7 @@ fun Home() {
                     ExposedDropdownMenu(expanded = expandedSex, onDismissRequest = { expandedSex = false }) {
                         sexes.forEach {
                             DropdownMenuItem(text = { Text(it) }, onClick = {
-                                sex = it
+                                homeViewModel.onSexChange(it)
                                 expandedSex = false
                             })
                         }
@@ -120,7 +112,7 @@ fun Home() {
                     onExpandedChange = { expandedActivity = !expandedActivity }
                 ) {
                     TextField(
-                        value = activityLevel,
+                        value = homeViewModel.activityLevel,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Nível de Atividade") },
@@ -130,7 +122,7 @@ fun Home() {
                     ExposedDropdownMenu(expanded = expandedActivity, onDismissRequest = { expandedActivity = false }) {
                         activityLevels.forEach {
                             DropdownMenuItem(text = { Text(it) }, onClick = {
-                                activityLevel = it
+                                homeViewModel.onActivityLevelChange(it)
                                 expandedActivity = false
                             })
                         }
@@ -138,23 +130,7 @@ fun Home() {
                 }
 
                 Button(
-                    onClick = {
-                        Calculations.calculateAllMetrics(
-                            height = height,
-                            weight = weight,
-                            age = age,
-                            sex = sex,
-                            activityLevel = activityLevel,
-                            response = { result ->
-                                metrics = result
-                                showError = false
-                            },
-                            onError = {
-                                showError = true
-                                metrics = null
-                            }
-                        )
-                    },
+                    onClick = { homeViewModel.calculate() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Calcular")
@@ -163,16 +139,16 @@ fun Home() {
 
             Spacer(Modifier.height(32.dp))
 
-            if (showError) {
+            if (homeViewModel.showError) {
                 Text(
-                    text = "Por favor, preencha todos os campos corretamente.",
+                    text = "Por favor, preencha todos os campos corretamente com valores válidos.",
                     color = Color.Red,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
             }
 
-            metrics?.let {
+            homeViewModel.metrics?.let {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,

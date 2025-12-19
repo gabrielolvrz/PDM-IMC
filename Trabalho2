@@ -1,0 +1,121 @@
+Trabalho 2
+IMC e outras métricas de saúde
+O objetivo desta atividade é desenvolver, evoluir e documentar uma aplicação Android de calculadora de IMC em Kotlin utilizando Jetpack Compose, a partir dos vídeos listados nas referências [1] e [2] ao final deste post.
+
+A partir da base criada nos vídeos, o estudante deverá refatorar o código, adicionar persistência de dados e incorporar outras funcionalidades de saúde.
+
+Informações importantes
+
+  - valor: 10 pontos
+
+  - Data de entrega e apresentação: 15/12/2025, segunda-feira, no horário da aula, em nossa sala.
+
+  - Grupo: 2 membros
+
+      * Enviar impreterivelmente até o dia 13/12/2025, sábado, os nomes dos membros da dupla pelo chat geral do Teams.
+
+  - Modo de envio: email para prof.asoares@ufu.br
+     Assunto: [PDM] Trabalho 2
+     Corpo: Link para o GitHub do projeto com o código, documentação e slides
+                   Nome completo dos integrantes do grupo
+
+  - LLMs: as regras para o uso de LLM's já foram discutidas no inicio do semestre e são aquelas contidas no arquivo regras.pdf na pasta Trabalhos da disciplina no Teams.
+
+  - Apresentação: a ordem de apresentação será por sorteio. Entretanto, grupos que se voluntariarem em até 4 horas antes da apresentação terão prioridade na apresentação.
+
+Nas apresentações, o aplicativo deve ser executado ao vivo tanto no emulador quanto no smartphone.
+Os trabalhos deverão executar sem problemas para serem considerados na avaliação. Membros ausentes não receberão nota.
+
+Contexto e base obrigatória
+
+O ponto de partida da tarefa é a calculadora de IMC construída nos vídeos indicados, que já realiza: entrada de dados (peso e altura), cálculo do IMC e exibição do resultado com classificação textual. O estudante deve recriar essa base no próprio projeto, garantindo que o aplicativo esteja funcional e bem estruturado, e então estender a solução conforme os requisitos abaixo.
+
+Requisitos de arquitetura e organização
+
+O aplicativo deve ser refatorado para utilizar uma arquitetura mínima baseada em MVVM, com separação clara entre camada de apresentação (composables), ViewModel e camada de dados/modelos. Toda a lógica de cálculo de IMC e de demais indicadores de saúde deve ficar fora dos composables, concentrada em classes de domínio e/ou use cases, invocadas pelo ViewModel.
+
+Persistência de dados
+
+O sistema deve armazenar o histórico das medições em um banco de dados local usando Room (ou outra solução de persistência equivalente para Android). Cada registro deve conter, no mínimo: identificador, data e hora, peso, altura, IMC, classificação de IMC e informações dos cálculos adicionais incluídos (por exemplo, TMB, peso ideal, percentual de gordura estimado). O aplicativo deve oferecer:
+
+- Uma tela de listagem do histórico, ordenada por data.
+
+- A possibilidade de visualizar os detalhes de uma medição específica.
+
+Funcionalidades adicionais de saúde
+
+Além do IMC, o aplicativo deve calcular e exibir pelo menos três das funcionalidades abaixo, com fórmulas documentadas em comentários no código e/ou em uma seção “Ajuda” dentro do app:
+
+1. Taxa Metabólica Basal (TMB), utilizando uma fórmula reconhecida (por exemplo, Mifflin-St Jeor ou Harris-Benedict), considerando sexo, idade, peso e altura.
+
+2. Estimativa de percentual de gordura corporal baseada em medidas adicionais (por exemplo, circunferências de cintura, pescoço e quadril, para fórmulas que as utilizam).
+
+3. Cálculo de peso ideal com ao menos uma fórmula clássica (Devine, Robinson, Miller ou similar).
+
+4. Estimativa de necessidade calórica diária a partir da TMB e de um fator de atividade física selecionado pelo usuário (sedentário, leve, moderado, intenso).
+
+Os resultados devem ser acompanhados de uma breve interpretação textual (por exemplo, faixas de IMC e significados) e, quando adequado, com cores ou ícones que indiquem zonas de risco ou faixas saudáveis.
+
+Interface, usabilidade e visualização
+
+A interface deve ser construída integralmente com Jetpack Compose, seguindo o padrão de estados e recomposição adequado. O aplicativo deve incluir:
+
+- Tela principal para entrada de dados e cálculo.
+
+- Tela de histórico, acessível por navegação (por exemplo, NavHost).
+
+- Tela de detalhes de uma medição, com todos os indicadores calculados para aquele registro.
+
+Opcionalmente, o estudante pode incluir visualizações gráficas (por exemplo, evolução do IMC ou da TMB ao longo do tempo) utilizando uma biblioteca de gráficos compatível com Compose.
+
+Validação, qualidade de código e documentação
+
+As entradas do usuário devem ser validadas, exibindo mensagens de erro claras em caso de dados inconsistentes (por exemplo, valores negativos, campos obrigatórios vazios, alturas irrealistas). O código deve seguir boas práticas de Kotlin e Compose (nomes significativos, funções pequenas, separação de responsabilidades, tratamento de estado com State/StateFlow ou similar).
+
+Entregáveis
+1. Código-fonte completo em repositório (por exemplo, Git), com README descrevendo funcionalidades, telas e decisões de arquitetura.
+
+2. Um breve documento (1–2 páginas) explicando: fórmulas utilizadas, modelo de dados, como a persistência foi implementada e quais melhorias poderiam ser feitas em versões futuras (por exemplo, integração com API externa de saúde ou autenticação de usuário).
+3. Slides da apresentação:
+• No máximo 4 slides.
+
+• Imagens, textos e códigos devem ser vı́siveis.
+
+– Não use fontes pequenas demais para serem vistas ou imagens borradas.
+
+– Não use captura de tela para código. Copie e cole o código que deseja frisar.
+
+• Apresentadores devem usar tom adequado para serem ouvidos por todos na sala. Devem ser cordiais com membros do grupo e com outros colegas.
+
+• Dois slides comentando:
+
+– sobre as dificuldades encontradas.
+
+– quais são as observações sobre as LLMs usadas: nomes das LLMs, alguns exemplos mais importantes de prompts, opinião geral do grupo sobre o uso das LLMs, etc.
+• Alguém do grupo deve mostrar o aplicativo funcionando no smartphone.
+• Se possível, quero que executem o aplicativo usando o emulador ao final da apresentação. Podem também espelhar a tela do celular em seu computador e projetar para que a turma toda veja.
+
+Critérios de avaliação
+
+A avaliação considerará:
+
+1. completude dos requisitos funcionais (IMC (1 ponto) + funcionalidades extras (3 pontos) + persistência (2 pontos)) (total de 6 pontos)
+
+2. qualidade da arquitetura e organização do código, uso correto de Jetpack Compose e MVVM, (1 ponto)
+
+3. qualidade da UI/UX, clareza da documentação e justificativa técnica das escolhas feitas. (2 pontos)
+
+4. Apresentação (1 ponto)
+
+Também será valorizada qualquer extensão adicional bem implementada, tal como:
+1. notificações para lembrar medições periódicas ou exportação de histórico em formato CSV/PDF (1 ponto extra)
+2. visualizações gráficas (por exemplo, evolução do IMC e da TMB ao longo do tempo, etc) (1 ponto extra)
+
+Grupos que ao serem chamados não apresentarem ou apresentarem o aplicativo parcialmente feito poderão apresentar na quinta-feira 18/12, com valor máximo de 7 pontos.
+Referências
+
+1. Android Studio: Criando um App de Calculadora de IMC com Jetpack Compose - Parte 1
+https://www.youtube.com/watch?v=G_k0GAS0J9Y
+
+2. Android Studio: Criando um App de Calculadora de IMC com Jetpack Compose - Parte 2
+https://www.youtube.com/watch?v=m9P7hYD50KM
